@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Sign Up | DSA Visualizer</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body class="login-page">
+
+
+    <div class="login-container">
+
+
+      
+
+        <div class="login-left">
+
+            <div class="login-brand">
+                ⚡ DSA Visualizer
+            </div>
+
+            <h1>
+                Start Your
+                <span>DSA Journey.</span>
+            </h1>
+
+            <p>
+                Create your account and start learning
+                Data Structures and Algorithms
+                through interactive visualizations.
+            </p>
+
+
+            <div class="login-features">
+
+                <div>
+                    🚀
+                    <strong>Learn</strong>
+                    <small>Understand DSA visually</small>
+                </div>
+
+                <div>
+                    🧠
+                    <strong>Practice</strong>
+                    <small>Improve your problem solving</small>
+                </div>
+
+                <div>
+                    🏆
+                    <strong>Master</strong>
+                    <small>Build strong DSA skills</small>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="login-card">
+
+
+            <div class="login-header">
+
+                <h2>Create Account 🚀</h2>
+
+                <p>
+                    Join DSA Visualizer today
+                </p>
+
+            </div>
+
+
+            <form id="signupForm">
+
+
+                <div class="form-group">
+
+                    <label for="signupName">
+                        Full Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="signupName"
+                        placeholder="Enter your name"
+                        required
+                    >
+
+                </div>
+
+
+                
+                <div class="form-group">
+
+                    <label for="signupEmail">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="signupEmail"
+                        placeholder="Enter your email"
+                        required
+                    >
+
+                </div>
+
+
+                
+                <div class="form-group">
+
+                    <label for="signupPassword">
+                        Password
+                    </label>
+
+                    <div class="password-box">
+
+                        <input
+                            type="password"
+                            id="signupPassword"
+                            placeholder="Create a password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            onclick="toggleSignupPassword(this)">
+
+                            👁
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                
+                <div class="form-group">
+
+                    <label for="confirmPassword">
+                        Confirm Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        placeholder="Confirm your password"
+                        required
+                    >
+
+                </div>
+
+
+                
+                <div class="remember-me">
+
+                    <input
+                        type="checkbox"
+                        id="terms"
+                        required
+                    >
+
+                    <label for="terms">
+                        I agree to the Terms & Conditions
+                    </label>
+
+                </div>
+
+
+                
+                <button
+                    type="submit"
+                    class="login-button">
+
+                    Create Account
+
+                </button>
+
+
+                
+                <div
+                    id="signupStatus"
+                    class="login-status">
+                </div>
+
+
+            </form>
+
+
+            
+            <div class="signup-text">
+
+                Already have an account?
+
+                <a href="login.html">
+                    Login
+                </a>
+
+            </div>
+
+
+            <a
+                href="index.html"
+                class="back-home">
+
+                ← Back to DSA Visualizer
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+
+    function toggleSignupPassword(button) {
+
+        let password =
+            document.getElementById("signupPassword");
+
+        if (password.type === "password") {
+
+            password.type = "text";
+            button.innerText = "🙈";
+
+        } else {
+
+            password.type = "password";
+            button.innerText = "👁";
+
+        }
+    }
+
+    document
+        .getElementById("signupForm")
+        .addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            let name =
+                document.getElementById("signupName").value.trim();
+
+            let email =
+                document.getElementById("signupEmail").value.trim();
+
+            let password =
+                document.getElementById("signupPassword").value;
+
+            let confirmPassword =
+                document.getElementById("confirmPassword").value;
+
+            let status =
+                document.getElementById("signupStatus");
+
+
+            if (password !== confirmPassword) {
+
+                status.innerText =
+                    "❌ Passwords do not match.";
+
+                return;
+            }
+
+
+            if (password.length < 6) {
+
+                status.innerText =
+                    "❌ Password must contain at least 6 characters.";
+
+                return;
+            }
+
+            let user = {
+                name: name,
+                email: email,
+                password: password
+            };
+
+            localStorage.setItem(
+                "dsaUser",
+                JSON.stringify(user)
+            );
+
+            status.innerText =
+                "✅ Account created successfully!";
+
+
+            setTimeout(function() {
+
+                window.location.href = "login.html";
+
+            }, 1000);
+
+        });
+
+</script>
+
+</body>
+
+</html>

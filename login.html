@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Login | DSA Visualizer</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body class="login-page">
+
+    <div class="login-container">
+
+        <div class="login-left">
+
+            <div class="login-brand">
+                ⚡ DSA Visualizer
+            </div>
+
+            <h1>
+                Learn DSA.
+                <span>Visually.</span>
+            </h1>
+
+            <p>
+                Master Data Structures and Algorithms
+                through interactive visualizations,
+                animations and practice.
+            </p>
+
+
+            <div class="login-features">
+
+                <div>
+                    ⚡
+                    <strong>Interactive</strong>
+                    <small>Step-by-step animations</small>
+                </div>
+
+                <div>
+                    🧠
+                    <strong>Understand</strong>
+                    <small>Learn the logic behind DSA</small>
+                </div>
+
+                <div>
+                    🎯
+                    <strong>Practice</strong>
+                    <small>Improve your problem solving</small>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="login-card">
+
+            <div class="login-header">
+
+                <h2>Welcome Back 👋</h2>
+
+                <p>
+                    Login to continue learning
+                </p>
+
+            </div>
+
+
+            <form id="loginForm">
+
+
+                <div class="form-group">
+
+                    <label for="loginEmail">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="loginEmail"
+                        placeholder="Enter your email"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="loginPassword">
+                        Password
+                    </label>
+
+                    <div class="password-box">
+
+                        <input
+                            type="password"
+                            id="loginPassword"
+                            placeholder="Enter your password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            id="showPassword"
+                            onclick="togglePassword()">
+                            👁
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="login-options">
+
+                    <label class="remember-me">
+
+                        <input
+                            type="checkbox"
+                            id="rememberMe"
+                        >
+
+                        Remember me
+
+                    </label>
+
+                    <a href="#">
+                        Forgot Password?
+                    </a>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="login-button">
+
+                    Login
+
+                </button>
+
+                <div
+                    id="loginStatus"
+                    class="login-status">
+                </div>
+
+
+            </form>
+
+            <div class="signup-text">
+
+                Don't have an account?
+
+                <a href="signup.html">
+                    Create Account
+                </a>
+
+            </div>
+
+            <a
+                href="index.html"
+                class="back-home">
+
+                ← Back to DSA Visualizer
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+   
+    function togglePassword() {
+
+        let password =
+            document.getElementById("loginPassword");
+
+        let button =
+            document.getElementById("showPassword");
+
+        if (password.type === "password") {
+
+            password.type = "text";
+            button.innerText = "🙈";
+
+        } else {
+
+            password.type = "password";
+            button.innerText = "👁";
+
+        }
+    }
+
+    document
+        .getElementById("loginForm")
+        .addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            let email =
+                document.getElementById("loginEmail").value.trim();
+
+            let password =
+                document.getElementById("loginPassword").value;
+
+            let status =
+                document.getElementById("loginStatus");
+
+            let savedUser =
+                localStorage.getItem("dsaUser");
+
+            if (!savedUser) {
+
+                status.innerText =
+                    "❌ No account found. Please create an account first.";
+
+                return;
+            }
+
+
+            let user =
+                JSON.parse(savedUser);
+
+            if (
+                email === user.email &&
+                password === user.password
+            ) {
+
+                status.innerText =
+                    "✅ Login successful!";
+
+                localStorage.setItem(
+                    "isLoggedIn",
+                    "true"
+                );
+
+                setTimeout(function() {
+
+                     window.location.href = "dashboard.html";
+                }, 1000);
+
+
+            } else {
+
+                status.innerText =
+                    "❌ Invalid email or password.";
+
+            }
+
+        });
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>DSA Visualizer</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+
+<body onload="checkLogin()">
+
+    <header class="header">
+
+        <div class="logo">
+            DSA Visualizer
+        </div>
+
+       <nav class="navbar">
+        <a href="dashboard.html">
+    Dashboard
+</a>
+    <a href="#sorting">Sorting</a>
+    <a href="#searching">Searching</a>
+    <a href="#data-structures">Data Structures</a>
+    <a href="#graphs">Graphs</a>
+
+    <div class="profile-menu">
+
+    <button
+        id="profileButton"
+        onclick="toggleProfileMenu()">
+        👤 <span id="userWelcome">User</span> ▾
+    </button>
+
+    <div
+        id="profileDropdown"
+        class="profile-dropdown">
+
+        <div class="profile-name" id="profileName">
+            User
+        </div>
+
+        <div class="profile-email" id="profileEmail">
+            user@email.com
+        </div>
+
+        <hr>
+
+        <button onclick="logoutUser()">
+            🚪 Logout
+        </button>
+
+    </div>
+
+</div>
+    <button id="themeToggle" onclick="toggleTheme()">
+        🌙 Dark Mode
+    </button>
+    <button id="logoutBtn" onclick="logoutUser()">
+    🚪 Logout
+</button>
+</nav>
+
+    </header>
+
+    <section class="hero">
+
+    <div class="hero-badge">
+        🚀 Learn DSA Visually
+    </div>
+
+    <h1>
+        Master DSA
+        <span>Visually.</span>
+    </h1>
+
+    <p>
+        Stop memorizing algorithms.
+        Start understanding them through
+        interactive visualizations.
+    </p>
+
+    <div class="hero-buttons">
+
+        <a href="#sorting" class="hero-primary">
+            ▶ Start Visualizing
+        </a>
+
+        <a href="#data-structures" class="hero-secondary">
+            Explore Data Structures
+        </a>
+
+    </div>
+
+    <div class="hero-features">
+
+        <div>
+            ⚡
+            <strong>Interactive</strong>
+            <small>Step-by-step animations</small>
+        </div>
+
+        <div>
+            🧠
+            <strong>Learn</strong>
+            <small>Understand the logic</small>
+        </div>
+
+        <div>
+            🎯
+            <strong>Practice</strong>
+            <small>Build DSA confidence</small>
+        </div>
+
+    </div>
+
+</section>
+   
+<section class="stats-section">
+
+    <div class="stat-card">
+        <div class="stat-number">7</div>
+        <div class="stat-title">Algorithms</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-number">5</div>
+        <div class="stat-title">Data Structures</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-number">100%</div>
+        <div class="stat-title">Interactive</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-number">24/7</div>
+        <div class="stat-title">Available</div>
+    </div>
+
+</section>
+
+    <section
+        class="main-section"
+        id="sorting"
+    >
+
+        <h2>
+            Sorting & Searching Visualizer
+        </h2>
+
+        <div class="controls">
+
+            <div class="control-group">
+
+                <label for="algorithm">
+                    Algorithm
+                </label>
+
+                <select id="algorithm">
+
+                    <option value="bubble">
+                        Bubble Sort
+                    </option>
+
+                    <option value="selection">
+                        Selection Sort
+                    </option>
+
+                    <option value="insertion">
+                        Insertion Sort
+                    </option>
+
+                    <option value="merge">
+                        Merge Sort
+                    </option>
+
+                    <option value="quick">
+                        Quick Sort
+                    </option>
+
+                    <option value="linear">
+                        Linear Search
+                    </option>
+
+                    <option value="binary">
+                        Binary Search
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="control-group">
+
+                <label for="arraySize">
+                    Array Size
+                </label>
+
+                <input
+                    type="range"
+                    id="arraySize"
+                    min="5"
+                    max="40"
+                    value="20"
+                >
+
+                <span id="arraySizeValue">
+                    20
+                </span>
+
+            </div>
+
+            <div class="control-group">
+
+                <label for="searchValue">
+                    Search Value
+                </label>
+
+                <input
+                    type="number"
+                    id="searchValue"
+                    placeholder="Enter value"
+                    min="1"
+                    max="100"
+                >
+
+            </div>
+
+            <div class="control-group">
+
+                <label for="speed">
+                    Speed
+                </label>
+
+                <input
+                    type="range"
+                    id="speed"
+                    min="50"
+                    max="1000"
+                    value="300"
+                >
+
+            </div>
+
+            <div class="buttons">
+
+                <button
+                    id="generateBtn"
+                    onclick="generateArray()"
+                >
+                    Generate Array
+                </button>
+
+                <button
+                    id="visualizeBtn"
+                    onclick="startAlgorithm()"
+                >
+                    Visualize
+                </button>
+
+                <button
+                    id="resetBtn"
+                    onclick="resetVisualizer()"
+                >
+                    Reset
+                </button>
+
+            </div>
+
+        </div>
+
+        <div
+            id="array"
+            class="visualizer"
+        >
+        </div>
+
+        <div
+            id="status"
+            class="status"
+        >
+            Generate an array to begin.
+        </div>
+
+        <div class="algorithm-info">
+
+            <h2 id="algorithm-title">
+                Algorithm Information
+            </h2>
+
+            <p id="algorithm-description">
+                Select an algorithm to see information.
+            </p>
+
+
+            <div class="complexity">
+
+                <div>
+                    <strong>Best</strong>
+                    <span id="best">-</span>
+                </div>
+
+                <div>
+                    <strong>Average</strong>
+                    <span id="average">-</span>
+                </div>
+
+                <div>
+                    <strong>Worst</strong>
+                    <span id="worst">-</span>
+                </div>
+
+                <div>
+                    <strong>Space</strong>
+                    <span id="space">-</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <section
+        class="stack-section"
+        id="data-structures"
+    >
+
+        <h2>
+            Stack Visualizer
+        </h2>
+
+
+        <div class="stack-controls">
+
+            <input
+                type="number"
+                id="stackValue"
+                placeholder="Enter value"
+            >
+
+            <button onclick="pushStack()">
+                Push
+            </button>
+
+            <button onclick="popStack()">
+                Pop
+            </button>
+
+            <button onclick="peekStack()">
+                Peek
+            </button>
+
+            <button onclick="clearStack()">
+                Clear
+            </button>
+
+        </div>
+
+
+        <div
+            id="stack"
+            class="stack"
+        >
+        </div>
+
+
+        <div
+            id="stackSize"
+            class="stack-size"
+        >
+            Stack Size: 0 / 8
+        </div>
+
+
+        <div
+            id="stackStatus"
+            class="status"
+        >
+            Stack is empty.
+        </div>
+
+    </section>
+
+    <section class="queue-section">
+
+        <h2>
+            Queue Visualizer
+        </h2>
+
+
+        <div class="queue-controls">
+
+            <input
+                type="number"
+                id="queueValue"
+                placeholder="Enter value"
+            >
+
+            <button onclick="enqueue()">
+                Enqueue
+            </button>
+
+            <button onclick="dequeue()">
+                Dequeue
+            </button>
+
+            <button onclick="peekQueue()">
+                Peek
+            </button>
+
+            <button onclick="clearQueue()">
+                Clear
+            </button>
+
+        </div>
+
+
+        <div
+            id="queue"
+            class="queue"
+        >
+        </div>
+
+
+        <div
+            id="queueSize"
+            class="queue-size"
+        >
+            Queue Size: 0 / 8
+        </div>
+
+
+        <div class="queue-info">
+
+            <span>
+                ← FRONT (Dequeue)
+            </span>
+
+            <span>
+                REAR → (Enqueue)
+            </span>
+
+        </div>
+
+
+        <div
+            id="queueStatus"
+            class="status"
+        >
+            Queue is empty.
+        </div>
+
+    </section>
+
+    <section class="linked-list-section">
+
+        <h2>
+            Linked List Visualizer
+        </h2>
+
+
+        <div class="linked-list-controls">
+
+            <input
+                type="number"
+                id="linkedListValue"
+                placeholder="Enter value"
+            >
+
+            <button onclick="insertNode()">
+                Insert
+            </button>
+
+            <button onclick="deleteNode()">
+                Delete
+            </button>
+
+            <button onclick="searchNode()">
+                Search
+            </button>
+
+            <button onclick="traverseLinkedList()">
+                Traverse
+            </button>
+
+            <button onclick="clearLinkedList()">
+                Clear
+            </button>
+
+        </div>
+
+
+        <div class="linked-list-wrapper">
+
+
+            <div
+                id="linkedListHead"
+                class="linked-label"
+            >
+                HEAD
+            </div>
+
+
+            <div
+                id="linkedList"
+                class="linked-list"
+            >
+            </div>
+
+
+            <div
+                id="linkedListTail"
+                class="linked-label"
+            >
+                TAIL
+            </div>
+
+
+        </div>
+
+
+        <div
+            id="linkedListSize"
+            class="linked-list-size"
+        >
+            List Size: 0
+        </div>
+
+
+        <div
+            id="linkedListStatus"
+            class="status"
+        >
+            Linked List is empty.
+        </div>
+
+    </section>
+
+    <section class="tree-section">
+
+        <h2>
+            Binary Search Tree Visualizer
+        </h2>
+
+
+        <div class="tree-controls">
+
+            <input
+                type="number"
+                id="treeValue"
+                placeholder="Enter value"
+            >
+
+
+            <button onclick="insertBST()">
+                Insert
+            </button>
+
+
+            <button onclick="searchBST()">
+                Search
+            </button>
+
+
+            <button onclick="deleteBST()">
+                Delete
+            </button>
+
+
+            <button onclick="inorderTraversal()">
+                Inorder
+            </button>
+
+
+            <button onclick="preorderTraversal()">
+                Preorder
+            </button>
+
+
+            <button onclick="postorderTraversal()">
+                Postorder
+            </button>
+
+
+            <button onclick="clearBST()">
+                Clear
+            </button>
+
+        </div>
+
+
+        <div
+            id="tree"
+            class="tree"
+        >
+        </div>
+
+
+        <div
+            id="treeStatus"
+            class="status"
+        >
+            Binary Search Tree is empty.
+        </div>
+
+    </section>
+
+    <section
+        class="graph-section"
+        id="graphs"
+    >
+
+        <h2>
+            Graph Visualizer
+        </h2>
+
+
+        <div class="graph-controls">
+
+            <input
+                type="number"
+                id="graphNodeValue"
+                placeholder="Node value"
+            >
+
+
+            <button onclick="addGraphNode()">
+                Add Node
+            </button>
+
+            <input
+                type="number"
+                id="graphFrom"
+                placeholder="From"
+            >
+
+
+            <input
+                type="number"
+                id="graphTo"
+                placeholder="To"
+            >
+
+
+            <button onclick="addGraphEdge()">
+                Add Edge
+            </button>
+
+
+            
+            <input
+                type="number"
+                id="graphStartNode"
+                placeholder="Start node"
+            >
+
+            <button onclick="startBFS()">
+                BFS
+            </button>
+
+
+            <button onclick="startDFS()">
+                DFS
+            </button>
+
+            <button onclick="clearGraph()">
+                Clear
+            </button>
+
+        </div>
+
+        <div
+            id="graph"
+            class="graph"
+        >
+        </div>
+
+        <div
+            id="graphStatus"
+            class="status"
+        >
+            Graph is empty.
+        </div>
+
+    </section>
+
+    <footer>
+
+        <p>
+            DSA Visualizer | Built with HTML, CSS & JavaScript
+        </p>
+
+    </footer>
+
+
+<script>
+
+    function checkLogin() {
+
+        let isLoggedIn =
+            localStorage.getItem("isLoggedIn");
+
+        if (isLoggedIn !== "true") {
+
+            window.location.href = "login.html";
+
+        }
+
+    }
+
+</script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>

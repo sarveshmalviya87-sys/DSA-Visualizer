@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | DSA Visualizer</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+</head>
+
+
+<body class="dashboard-page">
+
+    
+    <header class="header">
+
+        <div class="logo">
+            ⚡ DSA Visualizer
+        </div>
+
+        <nav class="navbar">
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="index.html">
+                Visualizer
+            </a>
+
+            <button
+                id="themeToggle"
+                onclick="toggleTheme()">
+
+                🌙 Dark Mode
+
+            </button>
+
+            <button
+                id="logoutBtn"
+                onclick="logoutUser()">
+
+                🚪 Logout
+
+            </button>
+
+        </nav>
+
+    </header>
+
+
+    
+    <main class="dashboard-container">
+
+
+       
+        <section class="dashboard-hero">
+
+            <div>
+
+                <div class="dashboard-badge">
+                    🚀 DSA Learning Platform
+                </div>
+
+                <h1>
+
+                    Welcome back,
+
+                    <span id="dashboardName">
+                        User
+                    </span>
+
+                    👋
+
+                </h1>
+
+                <p>
+
+                    Continue your journey and master
+                    Data Structures & Algorithms
+                    through interactive visualization.
+
+                </p>
+
+                <a
+                    href="index.html"
+                    class="dashboard-primary">
+
+                    ▶ Start Visualizing
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+        
+        <section class="dashboard-stats">
+
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    🧠
+                </div>
+
+                <div class="dashboard-number">
+                    7
+                </div>
+
+                <div class="dashboard-title">
+                    Algorithms
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    🌳
+                </div>
+
+                <div class="dashboard-number">
+                    5
+                </div>
+
+                <div class="dashboard-title">
+                    Data Structures
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    ⚡
+                </div>
+
+                <div class="dashboard-number">
+                    100%
+                </div>
+
+                <div class="dashboard-title">
+                    Interactive
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    🎯
+                </div>
+
+                <div class="dashboard-number">
+                    24/7
+                </div>
+
+                <div class="dashboard-title">
+                    Available
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+        
+        <section class="learning-section">
+
+            <h2>
+                Explore DSA
+            </h2>
+
+            <p>
+                Choose a topic and start learning visually.
+            </p>
+
+
+            <div class="learning-grid">
+
+
+                <a
+                    href="index.html#sorting"
+                    class="learning-card">
+
+                    <span>📊</span>
+
+                    <h3>
+                        Sorting
+                    </h3>
+
+                    <p>
+                        Bubble, Selection, Insertion,
+                        Merge and Quick Sort.
+                    </p>
+
+                </a>
+
+
+                <a
+                    href="index.html#searching"
+                    class="learning-card">
+
+                    <span>🔍</span>
+
+                    <h3>
+                        Searching
+                    </h3>
+
+                    <p>
+                        Learn Linear and Binary Search
+                        through animations.
+                    </p>
+
+                </a>
+
+
+                <a
+                    href="index.html#data-structures"
+                    class="learning-card">
+
+                    <span>🌳</span>
+
+                    <h3>
+                        Data Structures
+                    </h3>
+
+                    <p>
+                        Visualize Stack, Queue,
+                        Linked List and BST.
+                    </p>
+
+                </a>
+
+
+                <a
+                    href="index.html#graphs"
+                    class="learning-card">
+
+                    <span>🕸️</span>
+
+                    <h3>
+                        Graphs
+                    </h3>
+
+                    <p>
+                        Explore BFS and DFS
+                        step by step.
+                    </p>
+
+                </a>
+
+
+            </div>
+
+        </section>
+
+        <section class="profile-section">
+
+            <h2>
+                Your Profile
+            </h2>
+
+
+            <div class="profile-card">
+
+
+                <div class="profile-avatar">
+                    👤
+                </div>
+
+
+                <div class="profile-details">
+
+
+                    <div>
+
+                        <span>
+                            Name
+                        </span>
+
+                        <strong id="profileUserName">
+                            User
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Email
+                        </span>
+
+                        <strong id="profileUserEmail">
+                            user@email.com
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Status
+                        </span>
+
+                        <strong class="account-status">
+                            ● Active
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        
+        <section class="progress-section">
+
+            <h2>
+                Learning Progress
+            </h2>
+
+            <p>
+                Track your progress across different DSA topics.
+            </p>
+            
+
+<div class="overall-progress-card">
+
+    <div class="overall-progress-header">
+
+        <div>
+            <span class="overall-progress-label">
+                🎯 Overall DSA Progress
+            </span>
+
+            <p>
+                Your overall learning progress across all DSA topics.
+            </p>
+        </div>
+
+        <strong id="overallProgressText">
+            0%
+        </strong>
+
+    </div>
+
+
+    <div class="overall-progress-bar">
+
+        <div
+            id="overallProgress"
+            class="overall-progress-fill">
+        </div>
+
+    </div>
+
+</div>
+
+            <div class="progress-card">
+
+
+                
+                <div class="progress-item">
+
+                    <div class="progress-header">
+
+                        <span>
+                            Sorting
+                        </span>
+
+                        <strong id="sortingProgressText">
+                            80%
+                        </strong>
+
+                    </div>
+
+
+                    <div class="progress-bar">
+
+                        <div
+                            id="sortingProgress"
+                            class="progress-fill">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                
+                <div class="progress-item">
+
+                    <div class="progress-header">
+
+                        <span>
+                            Searching
+                        </span>
+
+                        <strong id="searchingProgressText">
+                            70%
+                        </strong>
+
+                    </div>
+
+
+                    <div class="progress-bar">
+
+                        <div
+                            id="searchingProgress"
+                            class="progress-fill">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                
+                <div class="progress-item">
+
+                    <div class="progress-header">
+
+                        <span>
+                            Data Structures
+                        </span>
+
+                        <strong id="dataStructuresProgressText">
+                            60%
+                        </strong>
+
+                    </div>
+
+
+                    <div class="progress-bar">
+
+                        <div
+                            id="dataStructuresProgress"
+                            class="progress-fill">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                
+                <div class="progress-item">
+
+                    <div class="progress-header">
+
+                        <span>
+                            Graphs
+                        </span>
+
+                        <strong id="graphsProgressText">
+                            40%
+                        </strong>
+
+                    </div>
+
+
+                    <div class="progress-bar">
+
+                        <div
+                            id="graphsProgress"
+                            class="progress-fill">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+                <button
+    class="reset-progress-btn"
+    onclick="resetProgress()">
+    🔄 Reset Progress
+</button>
+        </section>
+
+
+    </main>
+
+    <footer>
+
+        <p>
+            DSA Visualizer | Built with HTML, CSS & JavaScript
+        </p>
+
+    </footer>
+
+
+    
+    <script src="script.js"></script>
+
+
+<script>
+
+
+function checkDashboardLogin() {
+
+    let isLoggedIn = localStorage.getItem("isLoggedIn");
+
+    if (isLoggedIn !== "true") {
+
+        window.location.href = "login.html";
+        return;
+
+    }
+
+    let savedUser = localStorage.getItem("dsaUser");
+
+    if (savedUser) {
+
+        let user = JSON.parse(savedUser);
+
+        
+        let firstName = user.name.split(" ")[0];
+
+        document.getElementById("dashboardName").innerText = firstName;
+
+
+        
+        document.getElementById("profileUserName").innerText =
+            user.name;
+
+
+        document.getElementById("profileUserEmail").innerText =
+            user.email;
+
+    }
+
+}
+
+function loadProgress() {
+
+    let completed = JSON.parse(
+        localStorage.getItem("dsaCompleted")
+    ) || {};
+
+
+    
+    let sortingCompleted =
+        completed.sorting?.length || 0;
+
+    let sortingProgress =
+        (sortingCompleted / 5) * 100;
+
+
+    let searchingCompleted =
+        completed.searching?.length || 0;
+
+    let searchingProgress =
+        (searchingCompleted / 2) * 100;
+
+
+   
+    let dataStructuresCompleted =
+        completed.dataStructures?.length || 0;
+
+    let dataStructuresProgress =
+        (dataStructuresCompleted / 4) * 100;
+
+
+    
+    let graphsCompleted =
+        completed.graphs?.length || 0;
+
+    let graphsProgress =
+        (graphsCompleted / 2) * 100;
+
+
+    
+    sortingProgress =
+        Math.min(100, Math.max(0, sortingProgress));
+
+    searchingProgress =
+        Math.min(100, Math.max(0, searchingProgress));
+
+    dataStructuresProgress =
+        Math.min(100, Math.max(0, dataStructuresProgress));
+
+    graphsProgress =
+        Math.min(100, Math.max(0, graphsProgress));
+
+
+   
+    let progress = {
+
+        sorting: sortingProgress,
+
+        searching: searchingProgress,
+
+        dataStructures: dataStructuresProgress,
+
+        graphs: graphsProgress
+
+    };
+
+
+    localStorage.setItem(
+        "dsaProgress",
+        JSON.stringify(progress)
+    );
+
+}
+
+
+function displayProgress() {
+
+    let progress = JSON.parse(
+        localStorage.getItem("dsaProgress")
+    );
+
+
+    if (!progress) {
+        return;
+    }
+
+
+    
+    document.getElementById("sortingProgress").style.width =
+        progress.sorting + "%";
+
+    document.getElementById("sortingProgressText").innerText =
+        progress.sorting + "%";
+
+
+let overallProgress =
+    (
+        progress.sorting +
+        progress.searching +
+        progress.dataStructures +
+        progress.graphs
+    ) / 4;
+
+
+
+overallProgress =
+    Math.round(overallProgress * 100) / 100;
+
+
+
+document.getElementById("overallProgress").style.width =
+    overallProgress + "%";
+
+document.getElementById("overallProgressText").innerText =
+    overallProgress + "%";
+    
+    document.getElementById("searchingProgress").style.width =
+        progress.searching + "%";
+
+    document.getElementById("searchingProgressText").innerText =
+        progress.searching + "%";
+
+    document.getElementById("dataStructuresProgress").style.width =
+        progress.dataStructures + "%";
+
+    document.getElementById("dataStructuresProgressText").innerText =
+        progress.dataStructures + "%";
+
+
+   
+    document.getElementById("graphsProgress").style.width =
+        progress.graphs + "%";
+
+    document.getElementById("graphsProgressText").innerText =
+        progress.graphs + "%";
+
+}
+
+
+function resetProgress() {
+
+    let confirmReset = confirm(
+        "Are you sure you want to reset your learning progress?"
+    );
+
+
+    if (!confirmReset) {
+        return;
+    }
+
+
+    localStorage.removeItem("dsaProgress");
+
+    localStorage.removeItem("dsaCompleted");
+
+
+    loadProgress();
+
+    displayProgress();
+
+
+    alert("✅ Learning progress has been reset.");
+
+}
+
+
+checkDashboardLogin();
+
+loadProgress();
+
+displayProgress();
+
+</script>
+
+
+</body>
+
+</html>
