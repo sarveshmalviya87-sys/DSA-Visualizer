@@ -1071,7 +1071,7 @@ async function searchNode() {
                 " found at position " +
                 (i + 1) +
                 ".";
-
+                updateProgress("dataStructures", "search_linkedlist");
             return;
         }
 
@@ -1163,7 +1163,6 @@ function displayLinkedList() {
     document.getElementById("linkedListSize").innerText =
         "List Size: " +
         linkedList.length;
-                updateProgress("dataStructures", "delete_linkedlist");
 
 }
 
@@ -2557,50 +2556,73 @@ window.addEventListener(
     updateAlgorithmInfo
 );
 
-function checkLogin() {
 
-    let isLoggedIn =
-        localStorage.getItem("isLoggedIn");
+async function checkLogin() {
+    const client = window.supabaseClient;
 
-    if (isLoggedIn !== "true") {
-
+    if (!client) {
+        console.error("Supabase client is not loaded.");
         window.location.href = "login.html";
-
         return;
     }
 
-    let savedUser =
-        localStorage.getItem("dsaUser");
+    const { data: { session }, error } =
+        await client.auth.getSession();
 
-    if (savedUser) {
-
-        let user =
-            JSON.parse(savedUser);
-
-        document.getElementById("userWelcome").innerText =
-            user.name;
-
-        document.getElementById("profileName").innerText =
-            user.name;
-
-        document.getElementById("profileEmail").innerText =
-            user.email;
+    if (error || !session) {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("dsaUser");
+        window.location.href = "login.html";
+        return;
     }
+
+    const user = session.user;
+
+    const userName =
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        user.email?.split("@")[0] ||
+        "User";
+
+    const userInfo = {
+        id: user.id,
+        name: userName,
+        email: user.email
+    };
+
+    localStorage.setItem("dsaUser", JSON.stringify(userInfo));
+    localStorage.setItem("isLoggedIn", "true");
+
+    const userWelcome = document.getElementById("userWelcome");
+    const profileName = document.getElementById("profileName");
+    const profileEmail = document.getElementById("profileEmail");
+
+    if (userWelcome) userWelcome.innerText = userName;
+    if (profileName) profileName.innerText = userName;
+    if (profileEmail) profileEmail.innerText = user.email || "";
 }
 
-function logoutUser() {
-
-    /* Remove login status */
-
-    localStorage.removeItem(
-        "isLoggedIn"
-    );
 
 
-    
-    window.location.href =
-        "login.html";
+async function logoutUser() {
+    if (window.supabaseClient) {
+        const { error } = await window.supabaseClient.auth.signOut();
+
+        if (error) {
+            console.error("Logout failed:", error.message);
+            alert("Could not log out. Please try again.");
+            return;
+        }
+    }
+
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("dsaUser");
+    localStorage.removeItem("dsaProgress");
+    localStorage.removeItem("dsaCompleted");
+
+    window.location.href = "login.html";
 }
+
 
 function toggleProfileMenu() {
 
@@ -2610,117 +2632,119 @@ function toggleProfileMenu() {
     dropdown.classList.toggle("show");
 }
 
+let progressSaveQueue = Promise.resolve();
+
 function updateProgress(topic, activity) {
+    progressSaveQueue = progressSaveQueue
+        .then(async () => {
+            const client = window.supabaseClient;
 
-    let progress = JSON.parse(
-        localStorage.getItem("dsaProgress")
-    ) || {
-        sorting: 0,
-        searching: 0,
-        dataStructures: 0,
-        graph: 0
-    };
+            if (!client) {
+                console.error("Supabase client is not loaded.");
+                return;
+            }
 
-    let completed = JSON.parse(
-        localStorage.getItem("dsaCompleted")
-    ) || {};
+            const {
+                data: { session },
+                error: sessionError
+            } = await client.auth.getSession();
 
-    if (!completed[topic]) {
-        completed[topic] = [];
-    }
+            if (sessionError || !session) {
+                console.warn("Please log in to save progress.");
+                return;
+            }
 
-    if (completed[topic].includes(activity)) {
-        return;
-    }
+            const userId = session.user.id;
 
-    completed[topic].push(activity);
+            const { data: savedData, error: loadError } = await client
+                .from("user_progress")
+                .select("progress, completed")
+                .eq("user_id", userId)
+                .maybeSingle();
 
-    if (topic === "sorting") {
+            if (loadError) {
+                console.error("Could not load progress:", loadError.message);
+                return;
+            }
 
-        progress.sorting = Math.min(
-            completed.sorting.length * 20,
-            100
-        );
-    }
+            const progress = savedData?.progress || {
+                sorting: 0,
+                searching: 0,
+                dataStructures: 0,
+                graphs: 0
+            };
 
+            const completed = savedData?.completed || {};
 
-    else if (topic === "searching") {
+            if (completed.graph && !completed.graphs) {
+                completed.graphs = completed.graph;
+            }
+            delete completed.graph;
 
-        progress.searching = Math.min(
-            completed.searching.length * 50,
-            100
-        );
-    }
+            if (progress.graph !== undefined && progress.graphs === undefined) {
+                progress.graphs = progress.graph;
+            }
+            delete progress.graph;
 
+            if (topic === "graph") {
+                topic = "graphs";
+            }
 
-    else if (topic === "dataStructures") {
+            if (!Array.isArray(completed[topic])) {
+                completed[topic] = [];
+            }
 
-        let structuresCompleted = 0;
+            if (completed[topic].includes(activity)) {
+                localStorage.setItem("dsaProgress", JSON.stringify(progress));
+                localStorage.setItem("dsaCompleted", JSON.stringify(completed));
+                return;
+            }
 
-        
-        if (
-            completed.dataStructures.includes("stack") ||
-            completed.dataStructures.includes("push") &&
-            completed.dataStructures.includes("pop") &&
-            completed.dataStructures.includes("peek") &&
-            completed.dataStructures.includes("clear")
-        ) {
-            structuresCompleted++;
-        }
+            completed[topic].push(activity);
 
-        
-        if (
-            completed.dataStructures.includes("queue") ||
-            completed.dataStructures.includes("enqueue") &&
-            completed.dataStructures.includes("dequeue") &&
-            completed.dataStructures.includes("peekQueue") &&
-            completed.dataStructures.includes("clearQueue")
-        ) {
-            structuresCompleted++;
-        }
+            if (topic === "sorting") {
+                progress.sorting = Math.min(completed.sorting.length * 20, 100);
+            } else if (topic === "searching") {
+                progress.searching = Math.min(completed.searching.length * 50, 100);
+            } else if (topic === "dataStructures") {
+                const activities = completed.dataStructures;
 
-        if (
-            completed.dataStructures.includes("linkedlist") ||
-            completed.dataStructures.includes("insert") &&
-            completed.dataStructures.includes("delete") &&
-            completed.dataStructures.includes("search") &&
-            completed.dataStructures.includes("clearLinkedList")
-        ) {
-            structuresCompleted++;
-        }
+                const structures = [
+                    activities.some(item => item.startsWith("stack_")),
+                    activities.some(item => item.startsWith("queue_")),
+                    activities.some(item => item.includes("linkedlist")),
+                    activities.some(item => item.startsWith("bst"))
+                ];
 
-        
-        if (
-            completed.dataStructures.includes("bst") ||
-            completed.dataStructures.includes("insertBST") &&
-            completed.dataStructures.includes("searchBST") &&
-            completed.dataStructures.includes("deleteBST") &&
-            completed.dataStructures.includes("clearBST")
-        ) {
-            structuresCompleted++;
-        }
+                progress.dataStructures =
+                    structures.filter(Boolean).length * 25;
+            } else if (topic === "graphs") {
+                progress.graphs = Math.min(completed.graphs.length * 50, 100);
+            }
 
-        progress.dataStructures =
-            structuresCompleted * 25;
-    }
+            localStorage.setItem("dsaProgress", JSON.stringify(progress));
+            localStorage.setItem("dsaCompleted", JSON.stringify(completed));
 
+            const { error: saveError } = await client
+                .from("user_progress")
+                .upsert({
+                    user_id: userId,
+                    progress,
+                    completed,
+                    updated_at: new Date().toISOString()
+                }, {
+                    onConflict: "user_id"
+                });
 
-    
-    else if (topic === "graph" || topic === "graphs") {
+            if (saveError) {
+                console.error("Could not save progress:", saveError.message);
+            } else {
+                console.log("Progress saved to Supabase.");
+            }
+        })
+        .catch(error => {
+            console.error("Progress tracking failed:", error);
+        });
 
-        progress.graph = Math.min(
-            completed[topic].length * 25,
-            100
-        );
-    }
-
-    localStorage.setItem(
-        "dsaProgress",
-        JSON.stringify(progress)
-    );
-
-    localStorage.setItem(
-        "dsaCompleted",
-        JSON.stringify(completed)
-    );
+    return progressSaveQueue;
 }

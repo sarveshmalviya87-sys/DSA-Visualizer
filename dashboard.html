@@ -514,118 +514,162 @@
 
 
     
-    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
 
 
 <script>
 
 
-function checkDashboardLogin() {
 
-    let isLoggedIn = localStorage.getItem("isLoggedIn");
+async function checkDashboardLogin() {
+    const client = window.supabaseClient;
 
-    if (isLoggedIn !== "true") {
-
+    if (!client) {
+        console.error("Supabase client is not loaded.");
         window.location.href = "login.html";
         return;
-
     }
 
-    let savedUser = localStorage.getItem("dsaUser");
+    const { data: { session }, error } =
+        await client.auth.getSession();
 
-    if (savedUser) {
-
-        let user = JSON.parse(savedUser);
-
-        
-        let firstName = user.name.split(" ")[0];
-
-        document.getElementById("dashboardName").innerText = firstName;
-
-
-        
-        document.getElementById("profileUserName").innerText =
-            user.name;
-
-
-        document.getElementById("profileUserEmail").innerText =
-            user.email;
-
+    if (error || !session) {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("dsaUser");
+        window.location.href = "login.html";
+        return;
     }
 
-}
+    const user = session.user;
 
-function loadProgress() {
+    const userName =
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        user.email?.split("@")[0] ||
+        "User";
 
-    let completed = JSON.parse(
-        localStorage.getItem("dsaCompleted")
-    ) || {};
-
-
-    
-    let sortingCompleted =
-        completed.sorting?.length || 0;
-
-    let sortingProgress =
-        (sortingCompleted / 5) * 100;
-
-
-    let searchingCompleted =
-        completed.searching?.length || 0;
-
-    let searchingProgress =
-        (searchingCompleted / 2) * 100;
-
-
-   
-    let dataStructuresCompleted =
-        completed.dataStructures?.length || 0;
-
-    let dataStructuresProgress =
-        (dataStructuresCompleted / 4) * 100;
-
-
-    
-    let graphsCompleted =
-        completed.graphs?.length || 0;
-
-    let graphsProgress =
-        (graphsCompleted / 2) * 100;
-
-
-    
-    sortingProgress =
-        Math.min(100, Math.max(0, sortingProgress));
-
-    searchingProgress =
-        Math.min(100, Math.max(0, searchingProgress));
-
-    dataStructuresProgress =
-        Math.min(100, Math.max(0, dataStructuresProgress));
-
-    graphsProgress =
-        Math.min(100, Math.max(0, graphsProgress));
-
-
-   
-    let progress = {
-
-        sorting: sortingProgress,
-
-        searching: searchingProgress,
-
-        dataStructures: dataStructuresProgress,
-
-        graphs: graphsProgress
-
+    const userInfo = {
+        id: user.id,
+        name: userName,
+        email: user.email
     };
 
+    // Keep compatibility with the existing dashboard UI
+    localStorage.setItem("dsaUser", JSON.stringify(userInfo));
+    localStorage.setItem("isLoggedIn", "true");
 
-    localStorage.setItem(
-        "dsaProgress",
-        JSON.stringify(progress)
+    const firstName = userName.split(" ")[0];
+
+    const dashboardName = document.getElementById("dashboardName");
+    const profileUserName = document.getElementById("profileUserName");
+    const profileUserEmail = document.getElementById("profileUserEmail");
+
+    if (dashboardName) {
+        dashboardName.innerText = firstName;
+    }
+
+    if (profileUserName) {
+        profileUserName.innerText = userName;
+    }
+
+    if (profileUserEmail) {
+        profileUserEmail.innerText = user.email || "";
+    }
+}
+
+
+
+async function loadProgress() {
+    const client = window.supabaseClient;
+
+    if (!client) {
+        console.error("Supabase client is not loaded.");
+        return;
+    }
+
+    // Get the authenticated Supabase user
+    const { data: { session }, error: sessionError } =
+        await client.auth.getSession();
+
+    if (sessionError || !session) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    const userId = session.user.id;
+
+    // Fetch only this user's progress
+    const { data, error } = await client
+        .from("user_progress")
+        .select("progress, completed")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+    if (error) {
+        console.error("Could not load saved progress:", error.message);
+        return;
+    }
+
+    // A new account starts with empty progress
+    const completed = data?.completed || {};
+
+    let progress = data?.progress || {
+        sorting: 0,
+        searching: 0,
+        dataStructures: 0,
+        graphs: 0
+    };
+
+    // Support older data that used "graph" instead of "graphs"
+    if (completed.graph && !completed.graphs) {
+        completed.graphs = completed.graph;
+        delete completed.graph;
+    }
+
+    if (progress.graph !== undefined && progress.graphs === undefined) {
+        progress.graphs = progress.graph;
+        delete progress.graph;
+    }
+
+    // Calculate the category percentages
+    const sortingProgress = Math.min(
+        100,
+        ((completed.sorting?.length || 0) / 5) * 100
     );
 
+    const searchingProgress = Math.min(
+        100,
+        ((completed.searching?.length || 0) / 2) * 100
+    );
+
+    const structureActivities = completed.dataStructures || [];
+
+const structuresCompleted = [
+    structureActivities.some(item => item.startsWith("stack_")),
+    structureActivities.some(item => item.startsWith("queue_")),
+    structureActivities.some(item => item.includes("linkedlist")),
+    structureActivities.some(item => item.startsWith("bst"))
+].filter(Boolean).length;
+
+const dataStructuresProgress = structuresCompleted * 25;
+    const graphsProgress = Math.min(
+        100,
+        ((completed.graphs?.length || 0) / 2) * 100
+    );
+
+    progress = {
+        ...progress,
+        sorting: sortingProgress,
+        searching: searchingProgress,
+        dataStructures: dataStructuresProgress,
+        graphs: graphsProgress
+    };
+
+    // Update the local cache used by the existing dashboard
+    localStorage.setItem("dsaCompleted", JSON.stringify(completed));
+    localStorage.setItem("dsaProgress", JSON.stringify(progress));
 }
 
 
@@ -693,38 +737,78 @@ document.getElementById("overallProgressText").innerText =
 }
 
 
-function resetProgress() {
-
-    let confirmReset = confirm(
-        "Are you sure you want to reset your learning progress?"
+async function resetProgress() {
+    const confirmed = confirm(
+        "Are you sure you want to reset all your progress?"
     );
 
-
-    if (!confirmReset) {
+    if (!confirmed) {
         return;
     }
 
+    const client = window.supabaseClient;
 
-    localStorage.removeItem("dsaProgress");
+    if (!client) {
+        alert("Supabase is not available. Please refresh the page.");
+        return;
+    }
 
-    localStorage.removeItem("dsaCompleted");
+    const { data: { session }, error: sessionError } =
+        await client.auth.getSession();
 
+    if (sessionError || !session) {
+        alert("Your session has expired. Please log in again.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    const emptyProgress = {
+        sorting: 0,
+        searching: 0,
+        dataStructures: 0,
+        graphs: 0
+    };
+
+    const emptyCompleted = {};
+
+    const { error } = await client
+        .from("user_progress")
+        .upsert({
+            user_id: session.user.id,
+            progress: emptyProgress,
+            completed: emptyCompleted,
+            updated_at: new Date().toISOString()
+        }, {
+            onConflict: "user_id"
+        });
+
+    if (error) {
+        console.error("Could not reset progress:", error.message);
+        alert("Could not reset progress. Please try again.");
+        return;
+    }
+
+    localStorage.setItem(
+        "dsaProgress",
+        JSON.stringify(emptyProgress)
+    );
+
+    localStorage.setItem(
+        "dsaCompleted",
+        JSON.stringify(emptyCompleted)
+    );
 
     loadProgress();
-
     displayProgress();
 
-
-    alert("✅ Learning progress has been reset.");
-
+    alert("Your progress has been reset successfully!");
 }
 
-
-checkDashboardLogin();
-
-loadProgress();
-
-displayProgress();
+(async function () {
+    await checkDashboardLogin();
+    await loadProgress();
+    displayProgress();
+})();
 
 </script>
 

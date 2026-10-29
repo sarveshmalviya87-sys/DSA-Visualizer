@@ -708,21 +708,27 @@
 
 <script>
 
-    function checkLogin() {
+   async function checkLogin() {
+    const client = window.supabaseClient;
 
-        let isLoggedIn =
-            localStorage.getItem("isLoggedIn");
-
-        if (isLoggedIn !== "true") {
-
-            window.location.href = "login.html";
-
-        }
-
+    if (!client) {
+        window.location.href = "login.html";
+        return;
     }
 
+    const { data, error } = await client.auth.getSession();
+
+    if (error || !data.session) {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("dsaUser");
+        window.location.href = "login.html";
+    }
+}
+    checkLogin();
 </script>
-    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
 
 </body>
 

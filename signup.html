@@ -1,8 +1,8 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta name="viewport"
@@ -11,18 +11,13 @@
     <title>Sign Up | DSA Visualizer</title>
 
     <link rel="stylesheet" href="style.css">
-
 </head>
-
 
 <body class="login-page">
 
-
     <div class="login-container">
 
-
-      
-
+        <!-- LEFT SIDE -->
         <div class="login-left">
 
             <div class="login-brand">
@@ -39,7 +34,6 @@
                 Data Structures and Algorithms
                 through interactive visualizations.
             </p>
-
 
             <div class="login-features">
 
@@ -66,8 +60,8 @@
         </div>
 
 
+        <!-- SIGNUP CARD -->
         <div class="login-card">
-
 
             <div class="login-header">
 
@@ -80,8 +74,8 @@
             </div>
 
 
+            <!-- SIGNUP FORM -->
             <form id="signupForm">
-
 
                 <div class="form-group">
 
@@ -92,14 +86,16 @@
                     <input
                         type="text"
                         id="signupName"
+                        name="name"
                         placeholder="Enter your name"
+                        autocomplete="name"
+                        maxlength="100"
                         required
                     >
 
                 </div>
 
 
-                
                 <div class="form-group">
 
                     <label for="signupEmail">
@@ -109,14 +105,15 @@
                     <input
                         type="email"
                         id="signupEmail"
+                        name="email"
                         placeholder="Enter your email"
+                        autocomplete="email"
                         required
                     >
 
                 </div>
 
 
-                
                 <div class="form-group">
 
                     <label for="signupPassword">
@@ -128,16 +125,19 @@
                         <input
                             type="password"
                             id="signupPassword"
+                            name="password"
                             placeholder="Create a password"
+                            autocomplete="new-password"
+                            minlength="6"
                             required
                         >
 
                         <button
                             type="button"
-                            onclick="toggleSignupPassword(this)">
-
+                            onclick="toggleSignupPassword(this)"
+                            aria-label="Show or hide password"
+                        >
                             👁
-
                         </button>
 
                     </div>
@@ -145,7 +145,6 @@
                 </div>
 
 
-                
                 <div class="form-group">
 
                     <label for="confirmPassword">
@@ -155,14 +154,16 @@
                     <input
                         type="password"
                         id="confirmPassword"
+                        name="confirmPassword"
                         placeholder="Confirm your password"
+                        autocomplete="new-password"
+                        minlength="6"
                         required
                     >
 
                 </div>
 
 
-                
                 <div class="remember-me">
 
                     <input
@@ -172,33 +173,32 @@
                     >
 
                     <label for="terms">
-                        I agree to the Terms & Conditions
+                        I agree to the Terms &amp; Conditions
                     </label>
 
                 </div>
 
 
-                
                 <button
                     type="submit"
-                    class="login-button">
-
+                    class="login-button"
+                    id="signupButton"
+                >
                     Create Account
-
                 </button>
 
 
-                
+                <!-- STATUS MESSAGE -->
                 <div
                     id="signupStatus"
-                    class="login-status">
-                </div>
-
+                    class="login-status"
+                    role="status"
+                    aria-live="polite"
+                ></div>
 
             </form>
 
 
-            
             <div class="signup-text">
 
                 Already have an account?
@@ -212,10 +212,9 @@
 
             <a
                 href="index.html"
-                class="back-home">
-
+                class="back-home"
+            >
                 ← Back to DSA Visualizer
-
             </a>
 
         </div>
@@ -223,91 +222,256 @@
     </div>
 
 
+    <!-- SUPABASE LIBRARY -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- YOUR SUPABASE CONFIGURATION -->
+    <script src="supabase-config.js"></script>
+
+
     <script>
 
+        // ==========================================
+        // SHOW OR HIDE PASSWORD
+        // ==========================================
 
-    function toggleSignupPassword(button) {
+        function toggleSignupPassword(button) {
 
-        let password =
-            document.getElementById("signupPassword");
+            const passwordInput =
+                document.getElementById("signupPassword");
 
-        if (password.type === "password") {
+            if (passwordInput.type === "password") {
 
-            password.type = "text";
-            button.innerText = "🙈";
+                passwordInput.type = "text";
+                button.innerText = "🙈";
 
-        } else {
+            } else {
 
-            password.type = "password";
-            button.innerText = "👁";
+                passwordInput.type = "password";
+                button.innerText = "👁";
+
+            }
 
         }
-    }
 
-    document
-        .getElementById("signupForm")
-        .addEventListener("submit", function(event) {
+
+        // ==========================================
+        // SIGNUP FORM
+        // ==========================================
+
+        const signupForm =
+            document.getElementById("signupForm");
+
+        const signupStatus =
+            document.getElementById("signupStatus");
+
+        const signupButton =
+            document.getElementById("signupButton");
+
+
+        signupForm.addEventListener("submit", async function (event) {
 
             event.preventDefault();
 
-            let name =
-                document.getElementById("signupName").value.trim();
+            signupStatus.textContent = "";
 
-            let email =
-                document.getElementById("signupEmail").value.trim();
 
-            let password =
-                document.getElementById("signupPassword").value;
+            // CHECK SUPABASE CONNECTION
 
-            let confirmPassword =
-                document.getElementById("confirmPassword").value;
+            if (!window.supabaseClient) {
 
-            let status =
-                document.getElementById("signupStatus");
+                signupStatus.textContent =
+                    "Unable to connect to the authentication service. Please refresh the page and try again.";
 
+                return;
+
+            }
+
+
+            // GET FORM VALUES
+
+            const name =
+                document.getElementById("signupName")
+                    .value.trim();
+
+            const email =
+                document.getElementById("signupEmail")
+                    .value.trim();
+
+            const password =
+                document.getElementById("signupPassword")
+                    .value;
+
+            const confirmPassword =
+                document.getElementById("confirmPassword")
+                    .value;
+
+
+            // VALIDATE NAME
+
+            if (!name) {
+
+                signupStatus.textContent =
+                    "Please enter your full name.";
+
+                return;
+
+            }
+
+
+            // VALIDATE PASSWORD MATCH
 
             if (password !== confirmPassword) {
 
-                status.innerText =
-                    "❌ Passwords do not match.";
+                signupStatus.textContent =
+                    "Passwords do not match.";
 
                 return;
+
             }
 
+
+            // VALIDATE PASSWORD LENGTH
 
             if (password.length < 6) {
 
-                status.innerText =
-                    "❌ Password must contain at least 6 characters.";
+                signupStatus.textContent =
+                    "Password must contain at least 6 characters.";
 
                 return;
+
             }
 
-            let user = {
-                name: name,
-                email: email,
-                password: password
-            };
 
-            localStorage.setItem(
-                "dsaUser",
-                JSON.stringify(user)
-            );
+            // PREVENT MULTIPLE SUBMISSIONS
 
-            status.innerText =
-                "✅ Account created successfully!";
+            signupButton.disabled = true;
+
+            signupButton.textContent =
+                "Creating Account...";
 
 
-            setTimeout(function() {
+            try {
 
-                window.location.href = "login.html";
+                // CREATE A REAL SUPABASE ACCOUNT
 
-            }, 1000);
+                const { data, error } =
+                    await window.supabaseClient.auth.signUp({
+
+                        email: email,
+
+                        password: password,
+
+                        options: {
+
+                            data: {
+                                full_name: name
+                            },
+
+                            // Return to the existing public website.
+                            // This URL must be allowed in Supabase.
+
+                            emailRedirectTo:
+                                "https://sarveshmalviya87-sys.github.io/DSA-Visualizer/"
+
+                        }
+
+                    });
+
+
+                // HANDLE REGISTRATION ERRORS
+
+                if (error) {
+
+                    throw error;
+
+                }
+
+
+                // CONFIRMATION EMAIL REQUIRED
+
+                if (data.user && !data.session) {
+
+                    signupStatus.textContent =
+                        "Account registration started! Check your email for a confirmation link before logging in.";
+
+                    signupForm.reset();
+
+                    return;
+
+                }
+
+
+                // REGISTRATION WITHOUT EMAIL CONFIRMATION
+
+                if (data.user && data.session) {
+
+                    signupStatus.textContent =
+                        "Account created successfully! Redirecting to login...";
+
+                    signupForm.reset();
+
+                    setTimeout(function () {
+
+                        window.location.href = "login.html";
+
+                    }, 1500);
+
+                    return;
+
+                }
+
+
+                // UNEXPECTED RESPONSE
+
+                signupStatus.textContent =
+                    "We couldn't complete registration. Please try again.";
+
+            } catch (error) {
+
+                console.error("Signup error:", error);
+
+                // SHOW A FRIENDLY ERROR MESSAGE
+
+                if (
+                    error.message &&
+                    error.message.toLowerCase().includes("already registered")
+                ) {
+
+                    signupStatus.textContent =
+                        "An account may already exist with this email. Try logging in.";
+
+                } else if (
+                    error.message &&
+                    error.message.toLowerCase().includes("password")
+                ) {
+
+                    signupStatus.textContent =
+                        "Please check your password and try again.";
+
+                } else {
+
+                    signupStatus.textContent =
+                        error.message ||
+                        "Registration failed. Please check your connection and try again.";
+
+                }
+
+            } finally {
+
+                // RESTORE BUTTON
+
+                signupButton.disabled = false;
+
+                signupButton.textContent =
+                    "Create Account";
+
+            }
 
         });
 
-</script>
+    </script>
 
 </body>
-
 </html>
+```

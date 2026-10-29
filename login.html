@@ -1,8 +1,8 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta name="viewport"
@@ -11,14 +11,13 @@
     <title>Login | DSA Visualizer</title>
 
     <link rel="stylesheet" href="style.css">
-
 </head>
-
 
 <body class="login-page">
 
     <div class="login-container">
 
+        <!-- LEFT SIDE -->
         <div class="login-left">
 
             <div class="login-brand">
@@ -35,7 +34,6 @@
                 through interactive visualizations,
                 animations and practice.
             </p>
-
 
             <div class="login-features">
 
@@ -61,6 +59,8 @@
 
         </div>
 
+
+        <!-- LOGIN CARD -->
         <div class="login-card">
 
             <div class="login-header">
@@ -74,8 +74,8 @@
             </div>
 
 
+            <!-- LOGIN FORM -->
             <form id="loginForm">
-
 
                 <div class="form-group">
 
@@ -87,10 +87,12 @@
                         type="email"
                         id="loginEmail"
                         placeholder="Enter your email"
+                        autocomplete="email"
                         required
                     >
 
                 </div>
+
 
                 <div class="form-group">
 
@@ -104,19 +106,23 @@
                             type="password"
                             id="loginPassword"
                             placeholder="Enter your password"
+                            autocomplete="current-password"
                             required
                         >
 
                         <button
                             type="button"
                             id="showPassword"
-                            onclick="togglePassword()">
+                            onclick="togglePassword()"
+                            aria-label="Show or hide password"
+                        >
                             👁
                         </button>
 
                     </div>
 
                 </div>
+
 
                 <div class="login-options">
 
@@ -131,27 +137,32 @@
 
                     </label>
 
-                    <a href="#">
+                    <a href="reset-password.html">
                         Forgot Password?
                     </a>
 
                 </div>
 
+
                 <button
                     type="submit"
-                    class="login-button">
-
+                    class="login-button"
+                    id="loginButton"
+                >
                     Login
-
                 </button>
 
+
+                <!-- LOGIN STATUS -->
                 <div
                     id="loginStatus"
-                    class="login-status">
-                </div>
-
+                    class="login-status"
+                    role="status"
+                    aria-live="polite"
+                ></div>
 
             </form>
+
 
             <div class="signup-text">
 
@@ -163,12 +174,12 @@
 
             </div>
 
+
             <a
                 href="index.html"
-                class="back-home">
-
+                class="back-home"
+            >
                 ← Back to DSA Visualizer
-
             </a>
 
         </div>
@@ -176,91 +187,187 @@
     </div>
 
 
+    <!-- SUPABASE LIBRARY -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- SUPABASE CONFIGURATION -->
+    <script src="supabase-config.js"></script>
+
+
     <script>
 
-   
-    function togglePassword() {
+        // ==========================================
+        // SHOW OR HIDE PASSWORD
+        // ==========================================
 
-        let password =
-            document.getElementById("loginPassword");
+        function togglePassword() {
 
-        let button =
-            document.getElementById("showPassword");
+            const passwordInput =
+                document.getElementById("loginPassword");
 
-        if (password.type === "password") {
+            const button =
+                document.getElementById("showPassword");
 
-            password.type = "text";
-            button.innerText = "🙈";
+            if (passwordInput.type === "password") {
 
-        } else {
+                passwordInput.type = "text";
+                button.innerText = "🙈";
 
-            password.type = "password";
-            button.innerText = "👁";
+            } else {
+
+                passwordInput.type = "password";
+                button.innerText = "👁";
+
+            }
 
         }
-    }
 
-    document
-        .getElementById("loginForm")
-        .addEventListener("submit", function(event) {
+
+        // ==========================================
+        // LOGIN FORM
+        // ==========================================
+
+        const loginForm =
+            document.getElementById("loginForm");
+
+        const loginStatus =
+            document.getElementById("loginStatus");
+
+        const loginButton =
+            document.getElementById("loginButton");
+
+
+        loginForm.addEventListener("submit", async function (event) {
 
             event.preventDefault();
 
-            let email =
-                document.getElementById("loginEmail").value.trim();
+            loginStatus.textContent = "";
 
-            let password =
-                document.getElementById("loginPassword").value;
 
-            let status =
-                document.getElementById("loginStatus");
+            // CHECK SUPABASE CONNECTION
 
-            let savedUser =
-                localStorage.getItem("dsaUser");
+            if (!window.supabaseClient) {
 
-            if (!savedUser) {
-
-                status.innerText =
-                    "❌ No account found. Please create an account first.";
+                loginStatus.textContent =
+                    "Authentication service is unavailable. Refresh the page and try again.";
 
                 return;
+
             }
 
 
-            let user =
-                JSON.parse(savedUser);
+            // READ FORM VALUES
 
-            if (
-                email === user.email &&
-                password === user.password
-            ) {
+            const email =
+                document.getElementById("loginEmail")
+                    .value.trim();
 
-                status.innerText =
-                    "✅ Login successful!";
+            const password =
+                document.getElementById("loginPassword")
+                    .value;
+
+
+            // PREVENT REPEATED SUBMISSIONS
+
+            loginButton.disabled = true;
+
+            loginButton.textContent = "Logging in...";
+
+
+            try {
+
+                // AUTHENTICATE THROUGH SUPABASE
+
+                const { data, error } =
+                    await window.supabaseClient.auth
+                        .signInWithPassword({
+
+                            email: email,
+
+                            password: password
+
+                        });
+
+
+                if (error) {
+
+                    throw error;
+
+                }
+
+
+                if (!data.user) {
+
+                    throw new Error(
+                        "Login could not be completed. Please try again."
+                    );
+
+                }
+
+
+                // STORE BASIC DISPLAY INFORMATION ONLY.
+                // NEVER STORE THE USER'S PASSWORD.
+
+                const metadata =
+                    data.user.user_metadata || {};
+
+                const userName =
+                    metadata.full_name ||
+                    email.split("@")[0];
+
+                localStorage.setItem(
+                    "dsaUser",
+                    JSON.stringify({
+
+                        name: userName,
+
+                        email: data.user.email,
+
+                        id: data.user.id
+
+                    })
+                );
+
+
+                // KEEP THE EXISTING DASHBOARD COMPATIBLE.
+                // DASHBOARD ACCESS WILL ALSO NEED SESSION CHECKS.
 
                 localStorage.setItem(
                     "isLoggedIn",
                     "true"
                 );
 
-                setTimeout(function() {
 
-                     window.location.href = "dashboard.html";
-                }, 1000);
+                loginStatus.textContent =
+                    "Login successful! Opening your dashboard...";
 
 
-            } else {
+                setTimeout(function () {
 
-                status.innerText =
-                    "❌ Invalid email or password.";
+                    window.location.href = "dashboard.html";
+
+                }, 800);
+
+
+            } catch (error) {
+
+                console.error("Login error:", error);
+
+                loginStatus.textContent =
+                    "Login failed. Please check your email and password, and confirm your email if required.";
+
+
+            } finally {
+
+                loginButton.disabled = false;
+
+                loginButton.textContent = "Login";
 
             }
 
         });
 
-</script>
-
+    </script>
 
 </body>
-
 </html>
