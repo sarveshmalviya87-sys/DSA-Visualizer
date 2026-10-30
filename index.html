@@ -706,28 +706,87 @@
     </footer>
 
 
+<!-- Supabase library -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Supabase configuration -->
+<script src="supabase-config.js"></script>
+
+<!-- Authentication check -->
 <script>
+    async function checkLogin() {
+        const client = window.supabaseClient;
 
-   async function checkLogin() {
-    const client = window.supabaseClient;
+        if (!client) {
+            console.error("Supabase client failed to initialize.");
+            window.location.replace("login.html");
+            return;
+        }
 
-    if (!client) {
-        window.location.href = "login.html";
-        return;
+        try {
+            const { data, error } = await client.auth.getSession();
+
+            if (error) {
+                console.error("Authentication check failed:", error.message);
+                window.location.replace("login.html");
+                return;
+            }
+
+            if (!data.session) {
+                localStorage.removeItem("isLoggedIn");
+                localStorage.removeItem("dsaUser");
+
+                window.location.replace("login.html");
+                return;
+            }
+
+            // Update the profile using the authenticated account.
+            const user = data.session.user;
+
+            const fullName =
+                user.user_metadata?.full_name ||
+                user.user_metadata?.name ||
+                user.email?.split("@")[0] ||
+                "User";
+
+            const welcomeElement = document.getElementById("userWelcome");
+            const nameElement = document.getElementById("profileName");
+            const emailElement = document.getElementById("profileEmail");
+
+            if (welcomeElement) {
+                welcomeElement.textContent = fullName;
+            }
+
+            if (nameElement) {
+                nameElement.textContent = fullName;
+            }
+
+            if (emailElement) {
+                emailElement.textContent = user.email || "";
+            }
+
+            // Keep these values for compatibility with the existing UI.
+            localStorage.setItem("isLoggedIn", "true");
+            localStorage.setItem(
+                "dsaUser",
+                JSON.stringify({
+                    id: user.id,
+                    name: fullName,
+                    email: user.email
+                })
+            );
+
+        } catch (error) {
+            console.error("Unexpected authentication error:", error);
+            window.location.replace("login.html");
+        }
     }
 
-    const { data, error } = await client.auth.getSession();
-
-    if (error || !data.session) {
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("dsaUser");
-        window.location.href = "login.html";
-    }
-}
+    // Run the authentication check after Supabase initializes.
     checkLogin();
 </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
+
+<!-- Main visualizer JavaScript -->
 <script src="script.js"></script>
 
 </body>

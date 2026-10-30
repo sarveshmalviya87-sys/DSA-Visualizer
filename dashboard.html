@@ -806,6 +806,14 @@ async function resetProgress() {
 
 (async function () {
     await checkDashboardLogin();
+
+    const { data: { session } } =
+        await window.supabaseClient.auth.getSession();
+
+    if (!session) {
+        return;
+    }
+
     await loadProgress();
     displayProgress();
 })();
